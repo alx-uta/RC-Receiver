@@ -7,6 +7,7 @@
  */
 
 #include "rx.hpp"
+extern bool BINDING_KEY[16];
 
 Rx::Rx(
     Config& config
@@ -20,10 +21,27 @@ Rx::Rx(
 void Rx::setData(
     uint8_t* _payload
 ) {
-    // Get the config from the first two bytes
-    uint16_t config_combined_byte = this->combineBytes(
+
+    // Get the binding key from the first two bytes
+    uint16_t binding_key_combined_byte = this->combineBytes(
         _payload[0],
         _payload[1]
+    );
+
+    // Decode the uint16_t back into config and channels
+    bool decoded_binding_key[16];
+    this->decodeByteToStatuses(binding_key_combined_byte, decoded_binding_key, 16);
+
+    for (int i = 0; i < 16; i++) {
+        if(BINDING_KEY[i] != decoded_binding_key[i]) {
+            return;
+        }
+    }
+
+    // Get the config from the first two bytes
+    uint16_t config_combined_byte = this->combineBytes(
+        _payload[2],
+        _payload[3]
     );
 
     // Decode the uint16_t back into config and channels
@@ -40,7 +58,7 @@ void Rx::setData(
 }
 
 void Rx::setTXpayload(uint8_t* _payload) {
-    this->received_payload_size = 2;
+    this->received_payload_size = 4;
 
     for (int i = 3; i < 16; i++) {
         uint8_t channel = i - 2;

@@ -58,11 +58,6 @@ void SX1280_setup() {
         Serial.print("setCRC:");Serial.println(state);
     #endif
 
-    state = radio.setSyncWord(SX1280_SYNC_WORD, SX1280_SYNC_WORD_LEN);
-    #if ENABLE_RADIO_LIB_DEBUG
-        Serial.print("setSyncWord:");Serial.println(state);
-    #endif
-
     state = radio.setPreambleLength(SX1280_PREAMBLE_LENGTH);
     #if ENABLE_RADIO_LIB_DEBUG
         Serial.print("setSyncWord:");Serial.println(state);
@@ -105,9 +100,9 @@ void SX1280_setup() {
  * SX1280 Data Receive
  */
 void receiveData() {
-    // There's a default of two bytes
-    // used by the config
-    int received_payload_size = 2;
+    // There's a default of two bytes used by the binding key
+    // and two bytes used by the config
+    int received_payload_size = 4;
     if(receivedFlag) {
       enableInterrupt = false;
   
@@ -134,38 +129,115 @@ void receiveData() {
                 Serial.println(state);
             }
         #endif
+
         #if ENABLE_DEBUG
-            uint8_t current_position = 2;
-            bool data_received = false;
+            #if DEBUG_ALL_CHANNELS
+                // Left Joystick
+                Serial.print(_RX.left_joystick_up_down);
+                Serial.print("\t");
+                Serial.print(_RX.left_joystick_left_right);
+                Serial.print("\t");
+                
+                // Right Joystick
+                Serial.print(_RX.right_joystick_up_down);
+                Serial.print("\t");
+                Serial.print(_RX.right_joystick_left_right);
+                Serial.print("\t");
+                
+                // Potentiometers
+                int potentiometerValues[] = {
+                    _RX.potentiometer_1,
+                    _RX.potentiometer_2,
+                    _RX.potentiometer_3,
+                    _RX.potentiometer_4,
+                    _RX.potentiometer_5,
+                    _RX.potentiometer_6
+                };
 
-            Serial.print("size:");
-            if(_RX.received_payload_size<10) {
-                Serial.print(" ");
-            }
-            Serial.print(_RX.received_payload_size);
-            Serial.print(" bytes \t");
-
-            for (int i = 3; i < 16; i++) {
-                uint8_t channel = i - 2;
-                if (_RX.payload_config[i]) {
-                    uint8_t required_bytes = _RX.channels[channel-1].required_bytes;
-                    uint8_t first_byte = _payload[current_position++];
-                    uint8_t second_byte = (required_bytes == 2) ? _payload[current_position++] : 0;
-                    data_received = true;
-
-                    received_payload_size = received_payload_size + required_bytes;
-
-                    Serial.print("#");
-                    Serial.print(channel);
-                    Serial.print(":");
-                    Serial.print(first_byte);
-                    if(second_byte) {
-                        Serial.print(" ");
-                        Serial.print(second_byte);
+                for (int i = 0; i < 6; ++i) {
+                    Serial.print(potentiometerValues[i]);
+                    if(i<5) {
+                        Serial.print(":");
                     }
-                    Serial.print("\t");
                 }
-            }
+                Serial.print("\t");
+
+                // Switches
+                int switchesValues[] = {
+                    _RX.switch_1,
+                    _RX.switch_2,
+                    _RX.switch_3,
+                    _RX.switch_4,
+                    _RX.switch_5
+                };
+                for (int i = 0; i < 5; ++i) {
+                    Serial.print(switchesValues[i]);
+                    if(i<4) {
+                        Serial.print(":");
+                    }
+                }
+                Serial.print("\t");
+
+                // Left Rotary Encoder
+                Serial.print(_RX.left_rotary_encoder_position);
+                Serial.print("\t");
+                Serial.print(_RX.left_rotary_encoder_up);
+                Serial.print(":");
+                Serial.print(_RX.left_rotary_encoder_down);
+                Serial.print(":");
+                Serial.print(_RX.left_rotary_encoder_left);
+                Serial.print(":");
+                Serial.print(_RX.left_rotary_encoder_right);
+                Serial.print(":");
+                Serial.print(_RX.left_rotary_encoder_middle);
+                Serial.print("\t");
+
+                // Right Rotary Encoder
+                Serial.print(_RX.right_rotary_encoder_position);
+                Serial.print("\t");
+                Serial.print(_RX.right_rotary_encoder_up);
+                Serial.print(":");
+                Serial.print(_RX.right_rotary_encoder_down);
+                Serial.print(":");
+                Serial.print(_RX.right_rotary_encoder_left);
+                Serial.print(":");
+                Serial.print(_RX.right_rotary_encoder_right);
+                Serial.print(":");
+                Serial.print(_RX.right_rotary_encoder_middle);
+
+            #else
+                uint8_t current_position = 4;
+                bool data_received = false;
+
+                Serial.print("size:");
+                if(_RX.received_payload_size<10) {
+                    Serial.print(" ");
+                }
+                Serial.print(_RX.received_payload_size);
+                Serial.print(" bytes \t");
+
+                for (int i = 3; i < 16; i++) {
+                    uint8_t channel = i - 2;
+                    if (_RX.payload_config[i]) {
+                        uint8_t required_bytes = _RX.channels[channel-1].required_bytes;
+                        uint8_t first_byte = _payload[current_position++];
+                        uint8_t second_byte = (required_bytes == 2) ? _payload[current_position++] : 0;
+                        data_received = true;
+
+                        received_payload_size = received_payload_size + required_bytes;
+
+                        Serial.print("#");
+                        Serial.print(channel);
+                        Serial.print(":");
+                        Serial.print(first_byte);
+                        if(second_byte) {
+                            Serial.print(" ");
+                            Serial.print(second_byte);
+                        }
+                        Serial.print("\t");
+                    }
+                }
+            #endif
 
             Serial.println("");
         #endif
