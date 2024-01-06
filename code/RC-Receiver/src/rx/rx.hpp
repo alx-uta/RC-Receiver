@@ -61,7 +61,7 @@ public:
 
     // Left Rotary Encoder
     // Position
-    uint8_t left_rotary_encoder_position;
+    int left_rotary_encoder_position;
 
     // Push Buttons
     uint8_t left_rotary_encoder_up;
@@ -72,7 +72,7 @@ public:
 
     // Right Rotary Encoder
     // Position
-    uint8_t right_rotary_encoder_position;
+    int right_rotary_encoder_position;
 
     // Push Buttons
     uint8_t right_rotary_encoder_up;
