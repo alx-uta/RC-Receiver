@@ -151,6 +151,9 @@ public:
 
     uint8_t received_payload_size;
 
+    // Last received timestamp
+    int last_received_time;
+
  private:
     Config& _config;
 
