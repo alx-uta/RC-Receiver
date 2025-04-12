@@ -1,6 +1,6 @@
 # General
 .DS_Store
-/build/
+/code/build/
 .vscode
 **/user_config.hpp
 **/debug.cfg

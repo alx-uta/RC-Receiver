@@ -45,10 +45,4 @@ int     SX1280_CRC_VALUE                    = 1;
 int     SX1280_PREAMBLE_LENGTH              = 4;
 bool    SX1280_SET_HIGH_SENSITIVITY_MODE    = true;
 
-// Binding Key
-bool BINDING_KEY[16] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
-};
-
 #endif  // USER_CONFIG_HPP
