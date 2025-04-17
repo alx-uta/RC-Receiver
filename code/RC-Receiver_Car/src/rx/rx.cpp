@@ -40,15 +40,19 @@ void Rx::setData(
 }
 
 void Rx::setTXpayload(uint8_t* _payload) {
-    this->received_payload_size = 2;
+    uint8_t current_position = 2;
 
     for (int i = 3; i < 16; i++) {
         uint8_t channel = i - 2;
-        uint8_t required_bytes  = this->channels[channel-1].required_bytes;
-        int first_byte      = _payload[this->received_payload_size++];
-        int second_byte     = (required_bytes == 2) ? _payload[this->received_payload_size++] : 0;
-
-        this->setChannel(channel, first_byte, second_byte);
+        if (this->payload_config[i]) {
+            uint8_t required_bytes = this->channels[channel-1].required_bytes;
+            uint8_t first_byte = _payload[current_position++];
+            uint8_t second_byte = (required_bytes == 2) ? _payload[current_position++] : 0;
+            this->setChannel(channel, first_byte, second_byte);
+        } else {
+            uint8_t default_value = this->channels[channel-1].default_value;
+            this->setChannel(channel, default_value, 0);
+        }
     }
 }
 

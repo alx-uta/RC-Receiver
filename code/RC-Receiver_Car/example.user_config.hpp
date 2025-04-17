@@ -63,4 +63,6 @@ int DEFAULT_SERVO_POSITION = 90,
     MAX_SERVO_POSITION = 145,
     MIN_SERVO_POSITION = 35;
 
+int CUTOFF_TIME = 1000; // 1 second cutoff time
+
 #endif  // USER_CONFIG_HPP
